@@ -1,0 +1,503 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                Int               @id @default(autoincrement())
+  email             String            @unique
+  first_name        String
+  last_name         String
+  business_type     String?
+  password          String
+  avatar            String?
+  created_at        DateTime          @default(now())
+  updated_at        DateTime          @updatedAt
+  is_email_verified Boolean?          @default(false)
+  job_title         String?
+  gender            String?
+  website_url       String?
+  company           Company[]
+  access_token      AccessToken?      @relation(fields: [accessTokenId], references: [id])
+  accessTokenId     Int?
+  role              Role?             @relation(fields: [roleId], references: [id])
+  roleId            Int?
+  order_details     OrderDetail[]
+  address           Address[]
+  shippingAddress   ShippingAddress[]
+  rating            Rating[]
+  myFavourite       MyFavourite[]
+  product           Product[]
+  like              Like[]
+  social_media      SocialMedia[]
+  active            Boolean           @default(true)
+  Survey            Survey[]
+  motification      Notification[]
+  resetToken        String?
+  resetTokenExpiry  DateTime?
+  Cart              Cart[]
+}
+
+model Address {
+  id              Int               @id @default(autoincrement())
+  company         Company?          @relation(fields: [companyId], references: [id])
+  companyId       Int?
+  street          String?
+  city            String
+  country         String
+  postal_code     String
+  phone_number    Int
+  state           String?
+  created_at      DateTime          @default(now())
+  updated_at      DateTime          @updatedAt
+  address_1       String?
+  address_2       String?
+  user            User?             @relation(fields: [userId], references: [id])
+  userId          Int?
+  orderDetail     OrderDetail[]
+  shippingAddress ShippingAddress[]
+  active          Boolean?          @default(true)
+}
+
+model Company {
+  id              Int               @id @default(autoincrement())
+  company         String?
+  created_at      DateTime          @default(now())
+  updated_at      DateTime          @updatedAt
+  company_type    String?
+  address         Address[]
+  shippingAddress ShippingAddress[]
+  user            User[]
+  vision          String?           @db.LongText
+  mission         String?           @db.LongText
+  active          Boolean?          @default(true)
+}
+
+model AccessToken {
+  id         Int      @id @default(autoincrement())
+  verified   Boolean
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  user       User[]
+  active     Boolean? @default(true)
+}
+
+model Role {
+  id         Int      @id @default(autoincrement())
+  name       String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  user       User[]
+  active     Boolean? @default(true)
+}
+
+model Product {
+  id                  Int           @id @default(autoincrement())
+  name                String        @db.LongText
+  brand               String?
+  description         String?       @db.LongText
+  price               Int?
+  ar                  String?       @db.LongText
+  photo               Json?
+  product_img         Json?
+  thumbnails          String?
+  scene               String?       @db.LongText
+  glb_file_3d         String?       @db.LongText
+  video               String?       @db.LongText
+  weight              Int?
+  quantity            Int?
+  with_acrylic        Boolean       @default(false)
+  with_acrylic_price  Int           @default(0)
+  with_canvas         Boolean       @default(false)
+  with_canvas_price   Int           @default(0)
+  weight_addons       Int           @default(0)
+  in_stock            Boolean?      @default(true)
+  active              Boolean       @default(true)
+  is_nft              Boolean?      @default(false)
+  nft_link            String?
+  is_featured         Boolean       @default(false)
+  code                Int?          @default(000)
+  sku                 String?       @default("0000")
+  warranty            String?
+  warranty_expired_at DateTime?
+  on_sale             Boolean?      @default(false)
+  sale_price          Int?
+  coupon              String?
+  created_at          DateTime      @default(now())
+  updated_at          DateTime      @updatedAt
+  min_order           Int?          @default(0)
+  orientation         String?
+  // categories          Category[]
+  tag                 Tag?          @relation(fields: [tagId], references: [id])
+  tagId               Int?
+  palettes            Palette[]
+  colors              Json?
+  room_type           RoomType?     @relation(fields: [roomTypeId], references: [id])
+  roomTypeId          Int?
+  frame_size          FrameSize?    @relation(fields: [frameSizeId], references: [id])
+  frameSizeId         Int?
+  material            Material?     @relation(fields: [materialId], references: [id])
+  materialId          Int?
+  rating              Rating?       @relation(fields: [ratingId], references: [id])
+  ratingId            Int?
+  myFavourite         MyFavourite[]
+  artist              Artist?       @relation(fields: [artistId], references: [id])
+  artistId            Int?
+  designer            Designer?     @relation(fields: [designerId], references: [id])
+  designerId          Int?
+  user                User?         @relation(fields: [userId], references: [id])
+  userId              Int?
+  total_sold          Int           @default(0)
+  style               Style?        @relation(fields: [styleId], references: [id])
+  styleId             Int?
+  like                Like[]
+  Survey              Survey[]
+  is_bundle           Boolean       @default(false)
+  bundle_of           Int?          @default(1)
+  is_set              Boolean       @default(false)
+  set_of              Int           @default(1)
+  prices              Price?        @relation(fields: [priceId], references: [id])
+  priceId             Int?
+  category            Category?     @relation(fields: [categoryId], references: [id])
+  categoryId          Int?
+  packaging           Json?
+}
+
+model Price {
+  id             Int       @id @default(autoincrement())
+  active         Boolean   @default(true)
+  created_at     DateTime  @default(now())
+  updated_at     DateTime  @updatedAt
+  original_price Float
+  price1         Float
+  price2         Float
+  price3         Float
+  price4         Float
+  price5         Float
+  price6         Float
+  Product        Product[]
+}
+
+model SizeAndPrice {
+  id         Int      @id @default(autoincrement())
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  active     Boolean  @default(true)
+  price      Float
+  height     Int
+  width      Int
+  thick      Int
+  name       String?
+}
+
+model Artist {
+  id            Int          @id @default(autoincrement())
+  userId        Int?
+  first_name    String
+  email         String?      @unique
+  last_name     String
+  full_name     String?
+  company       String?
+  avatar        String?
+  address       String?      @db.LongText
+  motto         String?      @db.LongText
+  bio           String?      @db.LongText
+  social_media  SocialMedia? @relation(fields: [socialMediaId], references: [id])
+  socialMediaId Int?
+  is_featured   Boolean      @default(false)
+  created_at    DateTime     @default(now())
+  updated_at    DateTime     @updatedAt
+  product       Product[]
+  active        Boolean      @default(true)
+}
+
+model SocialMedia {
+  id             Int        @id @default(autoincrement())
+  created_at     DateTime   @default(now())
+  updated_at     DateTime   @updatedAt
+  facebook_link  String?    @db.LongText
+  linkedin_link  String?    @db.LongText
+  instagram_link String?    @db.LongText
+  portfolio_link String?    @db.LongText
+  website_link   String?    @db.LongText
+  artist         Artist[]
+  user           User?      @relation(fields: [userId], references: [id])
+  userId         Int?
+  Designer       Designer[]
+  active         Boolean?   @default(true)
+}
+
+model Designer {
+  id            Int          @id @default(autoincrement())
+  first_name    String
+  last_name     String
+  full_name     String?
+  company       String?
+  avatar        String?
+  created_at    DateTime     @default(now())
+  updated_at    DateTime     @updatedAt
+  product       Product[]
+  social_media  SocialMedia? @relation(fields: [socialMediaId], references: [id])
+  socialMediaId Int?
+  active        Boolean?     @default(true)
+}
+
+model Rating {
+  id          Int           @id @default(autoincrement())
+  rating      Decimal
+  user        User?         @relation(fields: [userId], references: [id])
+  userId      Int?
+  comment     String?
+  created_at  DateTime      @default(now())
+  updated_at  DateTime      @updatedAt
+  product     Product[]
+  orderDetail OrderDetail[]
+  active      Boolean?      @default(true)
+}
+
+model MyFavourite {
+  id         Int      @id @default(autoincrement())
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  user       User?    @relation(fields: [userId], references: [id])
+  userId     Int?
+  product    Product? @relation(fields: [productId], references: [id])
+  productId  Int?
+  active     Boolean? @default(true)
+}
+
+model Like {
+  id         Int      @id @default(autoincrement())
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  user       User?    @relation(fields: [userId], references: [id])
+  userId     Int?
+  product    Product? @relation(fields: [productId], references: [id])
+  productId  Int?
+  active     Boolean? @default(true)
+}
+
+model Category {
+  id         Int       @id @default(autoincrement())
+  name       String
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  products   Product[]
+  active     Boolean?  @default(true)
+}
+
+model Tag {
+  id         Int       @id @default(autoincrement())
+  name       String
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  product    Product[]
+  active     Boolean?  @default(true)
+}
+
+model Palette {
+  id         Int       @id @default(autoincrement())
+  name       String
+  hexcode    String?   @default("#000000")
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  products   Product[]
+  active     Boolean?  @default(true)
+}
+
+model Style {
+  id         Int       @id @default(autoincrement())
+  name       String
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  products   Product[]
+  active     Boolean?  @default(true)
+}
+
+model RoomType {
+  id         Int       @id @default(autoincrement())
+  name       String
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  product    Product[]
+  active     Boolean?  @default(true)
+}
+
+model FrameSize {
+  id         Int       @id @default(autoincrement())
+  name       String
+  width      Int?
+  height     Int?
+  depth      Int?
+  price      Float?    @default(51.54)
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  product    Product[]
+  active     Boolean?  @default(true)
+}
+
+model Material {
+  id         Int       @id @default(autoincrement())
+  name       String
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  product    Product[]
+  active     Boolean?  @default(true)
+}
+
+model Order {
+  id                 Int            @id @default(autoincrement())
+  created_at         DateTime       @default(now())
+  updated_at         DateTime       @updatedAt
+  product            Json
+  order_details      OrderDetail[]
+  status             String?
+  sold_price         Int?           @default(000)
+  transaction_id     Int?           @default(000)
+  total_price        Int?
+  active             Boolean?       @default(true)
+  instructions       String?        @db.LongText
+  with_acrylic       Boolean        @default(false)
+  with_acrylic_price Int            @default(0)
+  with_canvas        Boolean        @default(false)
+  with_canvas_price  Int            @default(0)
+  notification       Notification[]
+  cartTotalPrice     Float?
+}
+
+model PaymentMethod {
+  id             Int           @id @default(autoincrement())
+  created_at     DateTime      @default(now())
+  updated_at     DateTime      @updatedAt
+  payment_method String?
+  orderDetail    OrderDetail[]
+  active         Boolean?      @default(true)
+}
+
+model OrderDetail {
+  id                Int              @id @default(autoincrement())
+  created_at        DateTime         @default(now())
+  updated_at        DateTime         @updatedAt
+  user              User             @relation(fields: [userId], references: [id])
+  userId            Int
+  order             Order            @relation(fields: [orderId], references: [id])
+  orderId           Int
+  shipping_address  ShippingAddress? @relation(fields: [shippingAddressId], references: [id])
+  shippingAddressId Int?
+  address           Address?         @relation(fields: [addressId], references: [id])
+  addressId         Int?
+  payment_method    PaymentMethod?   @relation(fields: [paymentMethodId], references: [id])
+  paymentMethodId   Int?
+  rating            Rating?          @relation(fields: [ratingId], references: [id])
+  ratingId          Int?
+  active            Boolean?         @default(true)
+}
+
+model ShippingAddress {
+  id                Int           @id @default(autoincrement())
+  company           Company?      @relation(fields: [companyId], references: [id])
+  companyId         Int?
+  street            String?
+  city              String
+  country           String
+  state             String
+  postal_code       String
+  phone_number      Int
+  created_at        DateTime      @default(now())
+  updated_at        DateTime      @updatedAt
+  order_details     OrderDetail[]
+  address_1         String?       @db.LongText
+  address_2         String?       @db.LongText
+  same_with_Address Boolean?      @default(false)
+  user              User?         @relation(fields: [userId], references: [id])
+  userId            Int?
+  address           Address[]
+  active            Boolean?      @default(true)
+  set_default       Boolean       @default(false)
+}
+
+model Cart {
+  id         Int      @id @default(autoincrement())
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  active     Boolean? @default(true)
+  productId  Json?
+  quantity   Int?
+  status     String?
+  cartItems  Json
+  user       User?    @relation(fields: [userId], references: [id])
+  userId     Int?
+}
+
+model Contactform {
+  id         Int      @id @default(autoincrement())
+  email      String?
+  name       String?
+  company    String?
+  contact    String?
+  message    String?
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  active     Boolean? @default(true)
+}
+
+model VirtualGallery {
+  id         Int      @id @default(autoincrement())
+  email      String?
+  name       String?
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  active     Boolean? @default(true)
+}
+
+model Faq {
+  id         Int      @id @default(autoincrement())
+  title      String   @db.LongText
+  content    String   @db.LongText
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  active     Boolean? @default(true)
+}
+
+model Logo {
+  id         Int      @id @default(autoincrement())
+  path       String   @db.LongText
+  name       String   @db.LongText
+  height     String?
+  width      String?
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  active     Boolean? @default(true)
+}
+
+model Survey {
+  id             Int      @id @default(autoincrement())
+  survey_message String   @db.LongText
+  product        Product  @relation(fields: [productId], references: [id])
+  productId      Int
+  user           User     @relation(fields: [userId], references: [id])
+  userId         Int
+  quantity       Int?     @default(0)
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+  active         Boolean? @default(true)
+}
+
+model Notification {
+  id         Int      @id @default(autoincrement())
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  active     Boolean? @default(true)
+  user       User?    @relation(fields: [userId], references: [id])
+  userId     Int?
+  isRead     Boolean  @default(false)
+  order      Order?   @relation(fields: [orderId], references: [id])
+  orderId    Int?
+}
